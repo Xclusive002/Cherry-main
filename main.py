@@ -11,16 +11,21 @@ if __name__ == '__main__':
             "Couldn't import Django. Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?"
         ) from exc
 
-    # If no command is passed, start the Django development server.
     if len(sys.argv) == 1:
+        port = os.environ.get('PORT')
+        if port:
+            # In production deploys, use gunicorn instead of Django's dev server.
+            sys.argv = ['gunicorn', 'adultsite.wsgi', '--bind', f'0.0.0.0:{port}', '--workers', '3', '--timeout', '120']
+            from gunicorn.app.wsgiapp import run
+            run()
+            sys.exit(0)
+
         sys.argv += ['runserver', '0.0.0.0:8000']
 
     try:
         execute_from_command_line(sys.argv)
     except Exception as e:
-        # During build phase, some checks may fail due to missing database.
-        # Log the error but exit gracefully for build success.
-        if 'check' in sys.argv or len(sys.argv) == 1:
+        if 'check' in sys.argv or (len(sys.argv) == 1 and os.environ.get('PORT')):
             print(f"Warning: {e}", file=sys.stderr)
             sys.exit(0)
         raise
