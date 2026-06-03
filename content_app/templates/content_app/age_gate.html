@@ -1,0 +1,13 @@
+{% extends 'content_app/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Age Verification</h1>
+    <p>This site is restricted to adults 18 years or older. Please confirm your age before continuing.</p>
+    <form method="post" action="{% url 'age_gate' %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="button" type="submit" name="confirm_age" value="yes">I am 18 or older</button>
+    </form>
+</div>
+{% endblock %}

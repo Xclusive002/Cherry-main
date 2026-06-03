@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adult Content Platform</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #121212; color: #f7f7f7; }
+        header { background: #1a1a1a; padding: 16px; }
+        header a { color: #f7f7f7; margin-right: 16px; text-decoration: none; }
+        .container { max-width: 980px; margin: 0 auto; padding: 24px; }
+        .card { background: #1f1f1f; border: 1px solid #333; border-radius: 10px; padding: 18px; margin-bottom: 20px; }
+        .card img { max-width: 100%; border-radius: 8px; }
+        .button { display: inline-block; background: #bb1f40; color: #fff; padding: 10px 16px; border-radius: 6px; text-decoration: none; }
+        .button:hover { background: #d22b56; }
+        footer { text-align: center; padding: 24px; color: #999; }
+        .metadata { margin-bottom: 10px; color: #bbb; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'stories' %}">Stories</a>
+        <a href="/admin/">Admin</a>
+    </div>
+</header>
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+<footer>
+    <p>18+ only. Site for authorized adult viewing.</p>
+</footer>
+</body>
+</html>

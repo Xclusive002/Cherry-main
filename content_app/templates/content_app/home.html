@@ -1,0 +1,20 @@
+{% extends 'content_app/base.html' %}
+
+{% block content %}
+<h1>Featured Adult Content</h1>
+{% if items %}
+    {% for item in items %}
+        <div class="card">
+            <h2>{{ item.title }}</h2>
+            <div class="metadata">Type: {{ item.get_content_type_display }} | Published: {{ item.publish_date|date:'F j, Y' }}</div>
+            {% if item.thumbnail %}
+                <img src="{{ item.thumbnail.url }}" alt="{{ item.title }}">
+            {% endif %}
+            <p>{{ item.description|default:'No description added yet.' }}</p>
+            <a class="button" href="{% url 'content_detail' item.pk %}">View</a>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No content is available yet. Visit the admin panel to upload items.</p>
+{% endif %}
+{% endblock %}

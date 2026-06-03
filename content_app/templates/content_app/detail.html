@@ -1,0 +1,28 @@
+{% extends 'content_app/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>{{ item.title }}</h1>
+    <div class="metadata">Type: {{ item.get_content_type_display }} | Published: {{ item.publish_date|date:'F j, Y' }}</div>
+    {% if item.thumbnail %}
+        <img src="{{ item.thumbnail.url }}" alt="{{ item.title }}">
+    {% endif %}
+    <p>{{ item.description|default:'No description provided.' }}</p>
+
+    {% if item.content_type == 'story' %}
+        <div class="card" style="background:#252525;">
+            <h2>Story</h2>
+            <p>{{ item.story_text|linebreaksbr }}</p>
+        </div>
+    {% else %}
+        {% if item.video_file %}
+            <video controls style="width:100%; max-height:540px; border-radius: 10px; background:#000;">
+                <source src="{{ item.video_file.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        {% elif item.source_url %}
+            <p><a class="button" href="{{ item.source_url }}" target="_blank">Watch on Source</a></p>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

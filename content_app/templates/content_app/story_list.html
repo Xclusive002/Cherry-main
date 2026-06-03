@@ -1,0 +1,17 @@
+{% extends 'content_app/base.html' %}
+
+{% block content %}
+<h1>Adult Stories</h1>
+{% if items %}
+    {% for item in items %}
+        <div class="card">
+            <h2>{{ item.title }}</h2>
+            <div class="metadata">Published: {{ item.publish_date|date:'F j, Y' }}</div>
+            <p>{{ item.description|default:'Story item.' }}</p>
+            <a class="button" href="{% url 'content_detail' item.pk %}">Read Story</a>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>No stories have been published yet.</p>
+{% endif %}
+{% endblock %}
