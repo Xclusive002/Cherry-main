@@ -14,12 +14,12 @@ if __name__ == '__main__':
     if len(sys.argv) == 1:
         port = os.environ.get('PORT')
         if port:
-            # In production deploys, use gunicorn instead of Django's dev server.
-            sys.argv = ['gunicorn', 'adultsite.wsgi', '--bind', f'0.0.0.0:{port}', '--workers', '3', '--timeout', '120']
-            from gunicorn.app.wsgiapp import run
-            run()
-            sys.exit(0)
+            # Replace current process with gunicorn so the runtime PID is gunicorn.
+            # Use execvp so signals and exit codes are preserved.
+            bind = f'0.0.0.0:{port}'
+            os.execvp('gunicorn', ['gunicorn', 'adultsite.wsgi', '--bind', bind, '--workers', '3', '--timeout', '120'])
 
+        # Default to Django dev server locally when no PORT is set.
         sys.argv += ['runserver', '0.0.0.0:8000']
 
     try:
