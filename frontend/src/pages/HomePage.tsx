@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Play, Info } from 'lucide-react';
 import { ContentItem, contentAPI, DatingProfile, datingAPI } from '../services/api';
 import { CardSkeleton } from '../components/Skeletons';
-import { ContentCard } from '../components/ContentCard';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 
-export const HomePage: React.FC = () => {
+export const HomePage = () => {
   const [contents, setContents] = useState<ContentItem[]>([]);
   const [featured, setFeatured] = useState<ContentItem | null>(null);
   const [profiles, setProfiles] = useState<DatingProfile[]>([]);

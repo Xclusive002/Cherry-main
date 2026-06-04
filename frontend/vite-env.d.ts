@@ -2,6 +2,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
+  readonly DEV: boolean;
+  readonly MODE: string;
   // add more env variables here if needed
 }
 
