@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type Country = { name: string; code: string };
 type Subdivision = { code: string | null; name: string };
