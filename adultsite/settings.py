@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from urllib.parse import urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,15 +37,31 @@ def _env_list(name, default=None):
         return [item.strip() for item in value.split(',') if item.strip()]
     return default or []
 
+
+def _origin_from_url(url):
+    if not url:
+        return None
+    try:
+        parsed = urlparse(url.strip())
+        if parsed.scheme and parsed.netloc:
+            return f'{parsed.scheme}://{parsed.netloc}'
+    except Exception:
+        pass
+    return None
+
+DEFAULT_CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3001',
+    'http://localhost:3001',
+    'http://127.0.0.1:3002',
+    'http://localhost:3002',
+]
+
+frontend_origin = _origin_from_url(os.environ.get('FRONTEND_URL', ''))
+
 CORS_ALLOWED_ORIGINS = _env_list(
     'CORS_ALLOWED_ORIGINS',
-    [
-        'http://localhost:3000',
-        'http://127.0.0.1:3001',
-        'http://localhost:3001',
-        'http://127.0.0.1:3002',
-        'http://localhost:3002',
-    ],
+    DEFAULT_CORS_ALLOWED_ORIGINS + ([frontend_origin] if frontend_origin else []),
 )
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = _env_list('CSRF_TRUSTED_ORIGINS', CORS_ALLOWED_ORIGINS)

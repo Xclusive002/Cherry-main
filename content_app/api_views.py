@@ -900,13 +900,21 @@ def register_user(request):
 def login_user(request):
     try:
         data = get_json_body(request)
-        username = data.get('username')
-        password = data.get('password')
+        username = (data.get('username') or '').strip()
+        password = data.get('password') or ''
 
         if not username or not password:
             return json_response({'error': 'Username and password are required.'}, status=400)
 
         user = authenticate(request, username=username, password=password)
+        if user is None:
+            try:
+                matching_user = User.objects.get(username__iexact=username)
+                if matching_user.check_password(password):
+                    user = matching_user
+            except User.DoesNotExist:
+                user = None
+
         if user is None:
             return json_response({'error': 'Invalid credentials.'}, status=401)
 

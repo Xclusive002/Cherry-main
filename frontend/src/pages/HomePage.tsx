@@ -16,12 +16,18 @@ export const HomePage = () => {
     const fetchData = async () => {
       try {
         const data = await contentAPI.getAll();
-        setContents(data);
-        if (data.length > 0) {
-          setFeatured(data[0]);
+        if (Array.isArray(data)) {
+          setContents(data);
+          if (data.length > 0) {
+            setFeatured(data[0]);
+          }
+        } else {
+          console.error('Unexpected content API response, expected array:', data);
+          setContents([]);
         }
       } catch (error) {
         console.error('Failed to fetch content:', error);
+        setContents([]);
       } finally {
         setLoading(false);
       }
@@ -30,9 +36,15 @@ export const HomePage = () => {
     const fetchProfiles = async () => {
       try {
         const items = await datingAPI.discover();
-        setProfiles(items);
+        if (Array.isArray(items)) {
+          setProfiles(items);
+        } else {
+          console.error('Unexpected dating API response, expected array:', items);
+          setProfiles([]);
+        }
       } catch (err) {
         console.error('Failed to fetch profiles:', err);
+        setProfiles([]);
       }
     };
 
@@ -40,7 +52,10 @@ export const HomePage = () => {
     const fetchFeatured = async () => {
       try {
         const data = await contentAPI.getAll({ home: 1 });
-        if (data.length > 0) setFeatured(data[0]);
+        if (Array.isArray(data) && data.length > 0) setFeatured(data[0]);
+        else if (!Array.isArray(data)) {
+          console.error('Unexpected featured content API response, expected array:', data);
+        }
       } catch (err) {
         console.error('Failed to fetch featured content:', err);
       }

@@ -8,6 +8,12 @@ const API_BASE_URL = cleanApiUrl
     : `${cleanApiUrl}/api`
   : '/api';
 
+if (!rawApiUrl && import.meta.env.PROD) {
+  console.warn(
+    'VITE_API_URL is not set in production. Frontend API requests will use relative "\/api" paths. Set VITE_API_URL to your deployed backend URL to avoid runtime failures.'
+  );
+}
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
