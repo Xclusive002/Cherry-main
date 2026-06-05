@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { useStore } from '../store';
 
 export const AuthPage: React.FC = () => {
+  const user = useStore((state) => state.user);
+  const isLoading = useStore((state) => state.isLoading);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -17,6 +19,12 @@ export const AuthPage: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const setUser = useStore((state) => state.setUser);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoading && user?.is_authenticated) {
+      navigate('/');
+    }
+  }, [user, isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
