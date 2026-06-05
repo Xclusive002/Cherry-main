@@ -14,6 +14,20 @@ if (!rawApiUrl && import.meta.env.PROD) {
   );
 }
 
+function isHtmlResponse(data: any, headers: any): boolean {
+  if (typeof data !== 'string') return false;
+  const contentType = String(headers?.['content-type'] || headers?.['Content-Type'] || '').toLowerCase();
+  return contentType.includes('text/html') || data.trim().toLowerCase().startsWith('<!doctype html');
+}
+
+function ensureArray<T>(data: any, endpoint: string): T[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  console.error(`Unexpected ${endpoint} API response, expected array:`, data);
+  return [];
+}
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
@@ -21,6 +35,20 @@ export const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+api.interceptors.response.use(
+  (response) => {
+    if (isHtmlResponse(response.data, response.headers)) {
+      return Promise.reject(
+        new Error(
+          'Received HTML from API. This usually means the frontend is calling the wrong backend URL or the backend is returning an error page. Check VITE_API_URL and backend deployment.'
+        )
+      );
+    }
+    return response;
+  },
+  (error) => Promise.reject(error),
+);
 
 export interface CreatorSummary {
   id: number;
@@ -168,18 +196,19 @@ export interface DatingMatchItem {
 }
 
 export const contentAPI = {
-  getAll: (params?: Record<string, any>) => api.get<ContentItem[]>('/content/', { params }).then((res) => res.data),
+  getAll: (params?: Record<string, any>) =>
+    api.get<ContentItem[]>('/content/', { params }).then((res) => ensureArray<ContentItem>(res.data, '/content/')),
   getById: (id: number) => api.get<ContentItem>(`/content/${id}/`).then((res) => res.data),
   getByType: (type: 'video' | 'leak' | 'story' | 'image') =>
-    api.get<ContentItem[]>('/content/', { params: { type } }).then((res) => res.data),
+    api.get<ContentItem[]>('/content/', { params: { type } }).then((res) => ensureArray<ContentItem>(res.data, '/content/')),
   getByCreator: (creatorId: number) =>
-    api.get<ContentItem[]>('/content/', { params: { creator_id: creatorId } }).then((res) => res.data),
+    api.get<ContentItem[]>('/content/', { params: { creator_id: creatorId } }).then((res) => ensureArray<ContentItem>(res.data, '/content/')),
   create: (formData: FormData) => api.post<ContentItem>('/content/', formData).then((res) => res.data),
   purchase: (contentId: number) => api.post(`/purchase/content/${contentId}/`).then((res) => res.data),
 };
 
 export const creatorAPI = {
-  getAll: () => api.get<CreatorSummary[]>('/creators/').then((res) => res.data),
+  getAll: () => api.get<CreatorSummary[]>('/creators/').then((res) => ensureArray<CreatorSummary>(res.data, '/creators/')),
   getById: (id: number) => api.get<CreatorDetail>(`/creators/${id}/`).then((res) => res.data),
   getMe: () => api.get<CreatorDetail>('/creators/me/').then((res) => res.data),
   follow: (id: number) => api.post(`/creators/${id}/follow/`).then((res) => res.data),
@@ -189,23 +218,23 @@ export const creatorAPI = {
 };
 
 export const chatAPI = {
-  getThreads: () => api.get<ChatThread[]>('/chats/').then((res) => res.data),
+  getThreads: () => api.get<ChatThread[]>('/chats/').then((res) => ensureArray<ChatThread>(res.data, '/chats/')),
   getThread: (id: number) => api.get<{ thread: ChatThread; messages: ChatMessage[] }>(`/chats/${id}/`).then((res) => res.data),
   startChat: (creatorId: number) => api.post('/chats/start/', { creator_id: creatorId }).then((res) => res.data),
   sendMessage: (threadId: number, text: string) => api.post(`/chats/${threadId}/messages/`, { text }).then((res) => res.data),
 };
 
 export const notificationAPI = {
-  getAll: () => api.get<Notification[]>('/notifications/').then((res) => res.data),
+  getAll: () => api.get<Notification[]>('/notifications/').then((res) => ensureArray<Notification>(res.data, '/notifications/')),
   create: (title: string, message: string) => api.post('/notifications/', { title, message }).then((res) => res.data),
 };
 
 export const subscriptionAPI = {
-  getAll: () => api.get<SubscriptionItem[]>('/subscriptions/').then((res) => res.data),
+  getAll: () => api.get<SubscriptionItem[]>('/subscriptions/').then((res) => ensureArray<SubscriptionItem>(res.data, '/subscriptions/')),
 };
 
 export const roomAPI = {
-  getAll: () => api.get<RoomItem[]>('/rooms/').then((res) => res.data),
+  getAll: () => api.get<RoomItem[]>('/rooms/').then((res) => ensureArray<RoomItem>(res.data, '/rooms/')),
   getById: (roomId: number) => api.get<RoomItem>(`/rooms/${roomId}/`).then((res) => res.data),
   create: (payload: { title: string; description: string; price: number; is_active: boolean }) =>
     api.post<RoomItem>('/rooms/', payload).then((res) => res.data),
@@ -213,11 +242,12 @@ export const roomAPI = {
 };
 
 export const datingAPI = {
-  discover: (params?: Record<string, any>) => api.get<DatingProfile[]>('/dating/discover/', { params }).then((res) => res.data),
+  discover: (params?: Record<string, any>) =>
+    api.get<DatingProfile[]>('/dating/discover/', { params }).then((res) => ensureArray<DatingProfile>(res.data, '/dating/discover/')),
   getProfile: (id: number) => api.get<DatingProfile>(`/dating/profile/${id}/`).then((res) => res.data),
   updateProfile: (formData: FormData) => api.post('/dating/profile/update/', formData).then((res) => res.data),
   swipe: (targetId: number, direction: 'like' | 'pass') => api.post('/dating/swipe/', { target_id: targetId, direction }).then((res) => res.data),
-  getMatches: () => api.get<DatingMatchItem[]>('/dating/matches/').then((res) => res.data),
+  getMatches: () => api.get<DatingMatchItem[]>('/dating/matches/').then((res) => ensureArray<DatingMatchItem>(res.data, '/dating/matches/')),
 };
 
 export const authAPI = {
