@@ -10,10 +10,10 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onMenuToggle }) => {
   const user = useStore((state) => state.user);
+  const isLoading = useStore((state) => state.isLoading);
   const navigate = useNavigate();
   
-  // Determine profile link based on user type
-  const profileLink = user?.is_creator ? '/profile' : '/user-profile';
+  const profileLink = user?.is_creator ? '/profile' : user ? '/user-profile' : isLoading ? '/' : '/auth';
 
   return (
     <motion.nav

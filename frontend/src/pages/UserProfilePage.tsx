@@ -9,13 +9,23 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 export const UserProfilePage: React.FC = () => {
   const navigate = useNavigate();
   const { user, setUser } = useStore();
+  const isLoading = useStore((state) => state.isLoading);
   const [subscriptions] = useState<SubscriptionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [joiningRooms] = useState<number>(0); // TODO: fetch joined rooms count
 
   useEffect(() => {
-    if (!user?.is_authenticated || user.is_creator) {
+    if (isLoading) {
+      return;
+    }
+
+    if (!user?.is_authenticated) {
       navigate('/auth');
+      return;
+    }
+
+    if (user.is_creator) {
+      navigate('/profile');
       return;
     }
 

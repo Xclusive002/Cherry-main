@@ -21,8 +21,13 @@ export const DatingOnboardingPage: React.FC = () => {
   const [photo3, setPhoto3] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const isLoading = useStore((state) => state.isLoading);
 
   useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
     if (!user?.is_authenticated) {
       navigate('/auth');
       return;
@@ -36,7 +41,7 @@ export const DatingOnboardingPage: React.FC = () => {
       setInterests(user.profile.dating_interests || '');
       setPublicProfile(user.profile.dating_profile_public ?? true);
     }
-  }, [user, navigate]);
+  }, [user, navigate, isLoading]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

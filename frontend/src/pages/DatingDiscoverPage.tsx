@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { Heart, X, Sparkles } from 'lucide-react';
-import { DatingProfile, authAPI, datingAPI } from '../services/api';
+import { DatingProfile, datingAPI } from '../services/api';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useStore } from '../store';
 
@@ -13,7 +13,7 @@ export const DatingDiscoverPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
   const user = useStore((state) => state.user);
-  const setUser = useStore((state) => state.setUser);
+  const isLoading = useStore((state) => state.isLoading);
   const navigate = useNavigate();
 
   const loadProfiles = async () => {
@@ -32,12 +32,11 @@ export const DatingDiscoverPage: React.FC = () => {
       setLoading(true);
       try {
         if (!user?.is_authenticated) {
-          const currentUser = await authAPI.getCurrentUser();
-          setUser(currentUser);
-          if (!currentUser.is_authenticated) {
-            navigate('/auth');
+          if (isLoading) {
             return;
           }
+          navigate('/auth');
+          return;
         }
         await loadProfiles();
       } catch (error) {
@@ -50,7 +49,7 @@ export const DatingDiscoverPage: React.FC = () => {
     };
 
     init();
-  }, [user, navigate, setUser]);
+  }, [user, isLoading, navigate]);
 
   const currentProfile = profiles[currentIndex];
 
