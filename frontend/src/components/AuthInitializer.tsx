@@ -1,18 +1,17 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { LoadingOverlay } from './LoadingOverlay';
 import { authAPI } from '../services/api';
 import { useStore } from '../store';
 
 export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
   const setUser = useStore((state) => state.setUser);
   const setIsLoading = useStore((state) => state.setIsLoading);
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    if (user !== null || isLoading) {
-      return;
-    }
+    if (initializedRef.current) return;
+    initializedRef.current = true;
 
     let canceled = false;
     setIsLoading(true);
@@ -46,7 +45,7 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ child
       canceled = true;
       clearTimeout(timeoutId);
     };
-  }, [user, isLoading, setIsLoading, setUser]);
+  }, [setIsLoading, setUser]);
 
   if (isLoading) {
     return <LoadingOverlay />;
