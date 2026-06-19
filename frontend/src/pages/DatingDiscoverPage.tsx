@@ -11,9 +11,9 @@ export const DatingDiscoverPage: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
+  const authChecked = useStore((state) => state.authChecked);
   const navigate = useNavigate();
 
   const loadProfiles = async () => {
@@ -31,10 +31,10 @@ export const DatingDiscoverPage: React.FC = () => {
     const init = async () => {
       setLoading(true);
       try {
+        if (!authChecked || isLoading) {
+          return;
+        }
         if (!user?.is_authenticated) {
-          if (isLoading) {
-            return;
-          }
           navigate('/auth');
           return;
         }
@@ -44,12 +44,11 @@ export const DatingDiscoverPage: React.FC = () => {
         setMessage('Unable to load the page right now. Please refresh.');
       } finally {
         setLoading(false);
-        setAuthChecked(true);
       }
     };
 
     init();
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, authChecked, navigate]);
 
   const currentProfile = profiles[currentIndex];
 
@@ -79,7 +78,7 @@ export const DatingDiscoverPage: React.FC = () => {
     }
   };
 
-  if (loading || !authChecked) {
+  if (loading) {
     return <LoadingOverlay />;
   }
 

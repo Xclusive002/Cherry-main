@@ -10,14 +10,14 @@ interface ProtectedRouteProps {
 }
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAuth = true }) => {
-  const { ageVerified, setAgeVerified, user, isLoading } = useStore();
+  const { ageVerified, setAgeVerified, user, isLoading, authChecked } = useStore();
 
   if (!ageVerified) {
     return <AgeGate onVerify={() => setAgeVerified(true)} />;
   }
 
   if (requireAuth) {
-    if (isLoading) {
+    if (isLoading || !authChecked) {
       return <LoadingOverlay />;
     }
     if (!user?.is_authenticated) {

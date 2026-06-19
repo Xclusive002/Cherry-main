@@ -7,6 +7,7 @@ import { useStore } from '../store';
 export const AuthPage: React.FC = () => {
   const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
+  const authChecked = useStore((state) => state.authChecked);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -21,10 +22,10 @@ export const AuthPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isLoading && user?.is_authenticated) {
+    if (authChecked && !isLoading && user?.is_authenticated) {
       navigate('/');
     }
-  }, [user, isLoading, navigate]);
+  }, [user, isLoading, authChecked, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

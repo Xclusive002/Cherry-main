@@ -9,6 +9,7 @@ import PhotoUploadPremium from '../components/PhotoUploadPremium';
 
 export const DatingOnboardingPage: React.FC = () => {
   const user = useStore((state) => state.user);
+  const authChecked = useStore((state) => state.authChecked);
   const navigate = useNavigate();
   const [gender, setGender] = useState('');
   const [age, setAge] = useState('');
@@ -24,7 +25,7 @@ export const DatingOnboardingPage: React.FC = () => {
   const isLoading = useStore((state) => state.isLoading);
 
   useEffect(() => {
-    if (isLoading) {
+    if (!authChecked || isLoading) {
       return;
     }
 

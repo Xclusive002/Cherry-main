@@ -32,6 +32,8 @@ interface Store {
   setUser: (user: AuthUser | null) => void;
   isLoading: boolean;
   setIsLoading: (loading: boolean) => void;
+  authChecked: boolean;
+  setAuthChecked: (checked: boolean) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -53,4 +55,6 @@ export const useStore = create<Store>((set) => ({
   setUser: (user) => set({ user }),
   isLoading: false,
   setIsLoading: (loading) => set({ isLoading: loading }),
+  authChecked: false,
+  setAuthChecked: (checked) => set({ authChecked: checked }),
 }));

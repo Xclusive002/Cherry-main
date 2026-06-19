@@ -7,6 +7,7 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ child
   const isLoading = useStore((state) => state.isLoading);
   const setUser = useStore((state) => state.setUser);
   const setIsLoading = useStore((state) => state.setIsLoading);
+  const setAuthChecked = useStore((state) => state.setAuthChecked);
   const initializedRef = useRef(false);
 
   useEffect(() => {
@@ -16,10 +17,11 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ child
     let canceled = false;
     setIsLoading(true);
 
-    const timeoutId = setTimeout(() => {
+    const timeoutId = window.setTimeout(() => {
       if (!canceled) {
         setUser(null);
         setIsLoading(false);
+        setAuthChecked(true);
       }
     }, 5000);
 
@@ -29,11 +31,13 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ child
         clearTimeout(timeoutId);
         if (canceled) return;
         setUser(currentUser.is_authenticated ? currentUser : null);
+        setAuthChecked(true);
       })
       .catch(() => {
         clearTimeout(timeoutId);
         if (canceled) return;
         setUser(null);
+        setAuthChecked(true);
       })
       .finally(() => {
         if (!canceled) {
@@ -45,7 +49,7 @@ export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ child
       canceled = true;
       clearTimeout(timeoutId);
     };
-  }, [setIsLoading, setUser]);
+  }, [setIsLoading, setUser, setAuthChecked]);
 
   if (isLoading) {
     return <LoadingOverlay />;
