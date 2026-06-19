@@ -4,6 +4,7 @@ import { authAPI } from '../services/api';
 import { useStore } from '../store';
 
 export const AuthInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const user = useStore((state) => state.user);
   const isLoading = useStore((state) => state.isLoading);
   const setUser = useStore((state) => state.setUser);
   const setIsLoading = useStore((state) => state.setIsLoading);
