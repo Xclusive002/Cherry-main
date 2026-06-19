@@ -31,6 +31,7 @@ function ensureArray<T>(data: any, endpoint: string): T[] {
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
